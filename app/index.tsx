@@ -1,8 +1,16 @@
 import { colors } from "@/constants/theme";
-import React from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
 
-const index = () => {
+const Index = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    setTimeout(() => {
+      router.replace("/welcome");
+    }, 2000);
+  }, [router]);
   return (
     <View style={styles.container}>
       <Image
@@ -14,7 +22,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   container: {
@@ -25,6 +33,6 @@ const styles = StyleSheet.create({
   },
   image: {
     height: "20%",
-    aspectRatio:1,
+    aspectRatio: 1,
   },
 });
