@@ -25,6 +25,7 @@ const Login = () => {
     setIsLoading(true);
     try {
     } catch (error) {
+      console.log(error);
       Alert.alert("Login", "Something went wrong");
     } finally {
       setIsLoading(false);

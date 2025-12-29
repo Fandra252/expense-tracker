@@ -37,6 +37,7 @@ const Register = () => {
     setIsLoading(true);
     try {
     } catch (error) {
+      console.log(error);
       Alert.alert("Register", "Something went wrong");
     } finally {
       setIsLoading(false);
