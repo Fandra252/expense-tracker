@@ -4,13 +4,13 @@ import React, { useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
 
 const Index = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
-  useEffect(() => {
-    setTimeout(() => {
-      router.replace("/welcome");
-    }, 2000);
-  }, [router]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     router.replace("/welcome");
+  //   }, 2000);
+  // }, [router]);
   return (
     <View style={styles.container}>
       <Image

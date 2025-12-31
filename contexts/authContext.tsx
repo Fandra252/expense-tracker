@@ -1,11 +1,19 @@
 import { auth, firestore } from "@/config/firebase";
 import { AuthContextType, UserType } from "@/types";
+import { useRouter } from "expo-router";
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -13,12 +21,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<UserType>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log("firebaseUser", firebaseUser);
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser?.uid,
+          email: firebaseUser?.email,
+          name: firebaseUser?.displayName,
+        });
+        updateUserData(firebaseUser?.uid);
+        //@ts-ignore
+        router.replace("/(tabs)");
+      } else {
+        setUser(null);
+        router.replace("/(auth)/welcome");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error: any) {
       let msg = error.message;
+      console.log("error: ", msg);
+      if (msg.includes("user-not-found")) {
+        msg = "User not found";
+      } else if (msg.includes("auth/invalid-credential")) {
+        msg = "Invalid credentials";
+      } else if (msg.includes("auth/invalid-email")) {
+        msg = "Invalid email";
+      } else if (msg.includes("auth/wrong-password")) {
+        msg = "Wrong password";
+      } else {
+        msg = "Something went wrong";
+      }
       return { success: false, msg };
     }
   };
@@ -37,6 +79,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       return { success: true };
     } catch (error: any) {
       let msg = error.message;
+      if (msg.includes("auth/email-already-in-use")) {
+        msg = "This email is already in use";
+      } else if (msg.includes("auth/invalid-email")) {
+        msg = "Invalid email";
+      } else {
+        msg = "Something went wrong";
+      }
       return { success: false, msg };
     }
   };
@@ -49,9 +98,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const data = docSnap.data();
         const userData: UserType = {
           uid: data?.uid,
-          name: data?.name || null,
-          email: data?.email || null,
-          image: data?.image || null,
+          name: data.name || null,
+          email: data.email || null,
+          image: data.image || null,
         };
         setUser({ ...userData });
       }
