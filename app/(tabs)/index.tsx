@@ -10,20 +10,20 @@ import { StyleSheet } from "react-native";
 
 const Home = () => {
   const { user } = useAuth();
-  console.log("user: ", user);
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error: any) {
-      console.log("error: ", error);
-    }
-  };
+  // console.log("user: ", user);
+  // const handleLogout = async () => {
+  //   try {
+  //     await signOut(auth);
+  //   } catch (error: any) {
+  //     console.log("error: ", error);
+  //   }
+  // };
   return (
     <ScreenWrapper>
       <Typo>{user?.name}</Typo>
-      <Button onPress={handleLogout}>
+      {/* <Button onPress={handleLogout}>
         <Typo color={colors.black}>Logout</Typo>
-      </Button>
+      </Button> */}
     </ScreenWrapper>
   );
 };

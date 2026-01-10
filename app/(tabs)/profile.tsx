@@ -8,6 +8,7 @@ import { getProfileImage } from "@/services/ImageService";
 import { accountOptionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import * as Icon from "phosphor-react-native";
 import React from "react";
@@ -16,6 +17,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 const Profile = () => {
   const { user } = useAuth();
+  const router = useRouter();
 
   const accountOptions: accountOptionType[] = [
     {
@@ -66,6 +68,8 @@ const Profile = () => {
     if (item.title === "Logout") {
       showLogoutAlert();
     }
+
+    if (item.routeName) router.push(item.routeName);
   };
   return (
     <ScreenWrapper>
