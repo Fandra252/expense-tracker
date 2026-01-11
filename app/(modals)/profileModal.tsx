@@ -5,12 +5,16 @@ import Input from "@/components/Input";
 import ModalWrapper from "@/components/ModalWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContext";
 import { getProfileImage } from "@/services/ImageService";
+import { updateUser } from "@/services/userService";
 import { UserDataType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import * as Icon from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -20,11 +24,21 @@ import {
 } from "react-native";
 
 const ProfileModal = () => {
+  const { user, updateUserData } = useAuth();
+  const router = useRouter();
+
   const [userData, setUserData] = useState<UserDataType>({
     name: "",
     image: null,
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setUserData({
+      name: user?.name || "",
+      image: user?.image || null,
+    });
+  }, [user]);
 
   const onSubmit = async () => {
     let { name, image } = userData;
@@ -32,16 +46,30 @@ const ProfileModal = () => {
       Alert.alert("User", "Please fill all the fields");
       return;
     }
-    console.log("name", name);
-    console.log("image", image);
     setLoading(true);
-    // try {
-    // } catch (error) {
-    //   Alert.alert("User", "Something went wrong");
-    // } finally {
-    //   setLoading(false);
-    // }
+    const res = await updateUser(user?.uid as string, userData);
+    setLoading(false);
+    if (res.success) {
+      updateUserData(user?.uid as string);
+      router.back();
+    } else {
+      Alert.alert("User", res.msg);
+    }
   };
+
+  const onPickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setUserData({ ...userData, image: result.assets[0] });
+    }
+  };
+
   return (
     <ModalWrapper>
       <View style={styles.container}>
@@ -58,7 +86,7 @@ const ProfileModal = () => {
               contentFit="cover"
               transition={100}
             />
-            <TouchableOpacity style={styles.editIcon}>
+            <TouchableOpacity onPress={onPickImage} style={styles.editIcon}>
               <Icon.PencilIcon
                 size={verticalScale(20)}
                 color={colors.neutral800}
