@@ -41,7 +41,7 @@ const Profile = () => {
     {
       title: "Logout",
       icon: <Icon.PowerIcon size={26} color={colors.white} weight="fill" />,
-      routeName: "/(modals)/profileModal",
+      // routeName: "/(modals)/profileModal",
       bgColor: "#e11d48",
     },
   ];
