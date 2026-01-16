@@ -2,11 +2,14 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, radius, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
+import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 const Wallet = () => {
+  const router = useRouter();
+
   const getTotalBalance = () => {
     return 2344;
   };
@@ -30,7 +33,9 @@ const Wallet = () => {
             <Typo size={20} fontWeight={"500"}>
               My Wallets
             </Typo>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/(modals)/walletModal")}
+            >
               <Icons.PlusCircleIcon
                 size={verticalScale(33)}
                 color={colors.primary}
@@ -38,6 +43,8 @@ const Wallet = () => {
               />
             </TouchableOpacity>
           </View>
+
+          {/* todo: wallets list */}
         </View>
       </View>
     </ScreenWrapper>
