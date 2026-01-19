@@ -6,9 +6,11 @@ const CLOUDINARY_CLOUD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD
 
 export const uploadFileToCloudinary = async (
   file: { uri?: string } | string,
-  folderName: string
+  folderName: string,
 ): Promise<ResponseType> => {
   try {
+    if (!file) return { success: false, data: null };
+
     if (typeof file == "string") {
       return { success: true, data: file };
     }
@@ -45,4 +47,11 @@ export const getProfileImage = (file: any) => {
   if (file && typeof file == "object") return file.uri;
 
   return require("../assets/images/defaultAvatar.png");
+};
+
+export const getFilePath = (file: any) => {
+  if (file && typeof file == "string") return file;
+  if (file && typeof file == "object") return file.uri;
+
+  return null;
 };
