@@ -1,6 +1,7 @@
 import Loading from "@/components/Loading";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
+import WalletListItem from "@/components/WalletListItem";
 import { colors, radius, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFetchData from "@/hooks/useFetchData";
@@ -24,10 +25,10 @@ const Wallet = () => {
     where("uid", "==", user?.uid),
     orderBy("created", "desc"),
   ]);
-  console.log("wallet: ", wallets.length);
-  const getTotalBalance = () => {
-    return 2344;
-  };
+
+  const getTotalBalance = () =>
+    wallets.reduce((total, item) => total + (item.amount || 0), 0);
+
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
       <View style={styles.container}>
@@ -63,12 +64,12 @@ const Wallet = () => {
           {loading && <Loading />}
           <FlatList
             data={wallets}
-            // keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View>
-                <Typo>{item.name}</Typo>
-              </View>
-            )}
+            renderItem={({ item, index }) => {
+              return (
+                <WalletListItem wallet={item} index={index} router={router} />
+              );
+            }}
+            contentContainerStyle={styles.listStyles}
           />
         </View>
       </View>
