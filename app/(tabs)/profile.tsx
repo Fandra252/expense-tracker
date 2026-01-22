@@ -96,9 +96,7 @@ const Profile = () => {
         <View style={styles.accountOptions}>
           {accountOptions.map((item, index) => (
             <Animated.View
-              entering={FadeInDown.delay(index * 50)
-                .springify()
-                .damping(14)}
+              entering={FadeInDown.delay(index * 50).springify()}
               key={index}
               style={styles.litItem}
             >
