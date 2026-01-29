@@ -1,5 +1,6 @@
 import HomeCard from "@/components/HomeCard";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import TransactionList from "@/components/TransactionList";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
@@ -36,7 +37,17 @@ const Home = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* Card */}
-          <HomeCard />
+          <View>
+            <HomeCard />
+          </View>
+          <View>
+            <TransactionList
+              title="Recent Transactions"
+              emptyListMessage="No transactions found"
+              data={[]}
+              loading={false}
+            />
+          </View>
         </ScrollView>
       </View>
     </ScreenWrapper>
