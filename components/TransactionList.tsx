@@ -1,9 +1,11 @@
+import { expenseCategories } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { TransactionItemProps, TransactionListType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { FlashList } from "@shopify/flash-list";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import Loading from "./Loading";
 import Typo from "./Typo";
 
@@ -60,24 +62,43 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
+  const category = expenseCategories["transportation"];
+  const IconComponent = category.icon;
   return (
-    <View style={styles.row}>
-      <View style={styles.icon}>
-        <Typo size={20} fontWeight={"500"}>
-          {index + 1}
-        </Typo>
-      </View>
-      <View style={styles.categoryDes}>
-        <Typo size={20} fontWeight={"500"}>
-          {item}
-        </Typo>
-      </View>
-      <View style={styles.amoutDate}>
-        <Typo size={20} fontWeight={"500"}>
-          {item}
-        </Typo>
-      </View>
-    </View>
+    <Animated.View entering={FadeInDown.delay(index * 70).springify()}>
+      <TouchableOpacity style={styles.row} onPress={() => handleClick(item)}>
+        <View style={[styles.icon, { backgroundColor: category.bgColor }]}>
+          {IconComponent && (
+            <IconComponent
+              size={verticalScale(25)}
+              weight="fill"
+              color={colors.white}
+            />
+          )}
+        </View>
+
+        <View style={styles.categoryDes}>
+          <Typo size={17}>{category.label}</Typo>
+          <Typo
+            size={12}
+            color={colors.neutral400}
+            textProps={{ numberOfLines: 1 }}
+          >
+            {/* {item?.description} */}
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+            quod.
+          </Typo>
+        </View>
+        <View style={styles.amoutDate}>
+          <Typo fontWeight={"500"} color={colors.rose}>
+            - ₹23
+          </Typo>
+          <Typo size={13} color={colors.neutral400}>
+            12 jan
+          </Typo>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
