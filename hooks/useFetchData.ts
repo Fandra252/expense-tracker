@@ -40,7 +40,8 @@ const useFetchData = <T>(
       },
     );
     return () => unsub();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [constraints.length]);
   return { data, loading, error };
 };
 

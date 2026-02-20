@@ -35,8 +35,8 @@ const TransactionList = ({
               handleClick={handleClick}
             />
           )}
-          //@ts-ignore
-          estimatedListSize={60}
+          // @ts-ignore
+          estimatedItemSize={60}
         />
       </View>
       {!loading && data.length === 0 && (
@@ -62,7 +62,8 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
-  const category = expenseCategories["transportation"];
+  console.log("item description", item.description);
+  const category = expenseCategories[item?.category || "others"];
   const IconComponent = category.icon;
   return (
     <Animated.View entering={FadeInDown.delay(index * 70).springify()}>
@@ -84,17 +85,15 @@ const TransactionItem = ({
             color={colors.neutral400}
             textProps={{ numberOfLines: 1 }}
           >
-            {/* {item?.description} */}
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-            quod.
+            {item?.description}
           </Typo>
         </View>
         <View style={styles.amoutDate}>
           <Typo fontWeight={"500"} color={colors.rose}>
-            - ₹23
+            - ₹{item?.amount}
           </Typo>
           <Typo size={13} color={colors.neutral400}>
-            12 jan
+            {item?.date.toDate().toLocaleDateString()}
           </Typo>
         </View>
       </TouchableOpacity>

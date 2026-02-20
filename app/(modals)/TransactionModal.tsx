@@ -9,6 +9,7 @@ import { expenseCategories, transactionTypes } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFetchData from "@/hooks/useFetchData";
+import { createOrUpdateTransaction } from "@/services/transactionService";
 import { deleteWallet } from "@/services/walletService";
 import { TransactionType, WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
@@ -18,7 +19,7 @@ import DateTimePicker, {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Platform,
@@ -57,14 +58,14 @@ const TransactionModal = () => {
     orderBy("created", "desc"),
   ]);
 
-  useEffect(() => {
-    if (oldTransaction?.id) {
-      setTransaction({
-        name: oldTransaction.name,
-        image: oldTransaction.image,
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (oldTransaction?.id) {
+  //     setTransaction({
+  //       name: oldTransaction.name,
+  //       image: oldTransaction.image,
+  //     });
+  //   }
+  // }, []);
 
   const onSubmit = async () => {
     const { type, amount, description, category, date, walletId, image } =
@@ -83,14 +84,26 @@ const TransactionModal = () => {
       image,
       uid: user?.uid,
     };
-    console.log(transactionData);
+
+    setLoading(true);
+    const res = await createOrUpdateTransaction(transactionData);
+
+    setLoading(false);
+
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Transaction", res.msg);
+    }
   };
 
   const onDelete = async () => {
     if (!oldTransaction?.id) return;
+
     setLoading(true);
     const res = await deleteWallet(oldTransaction?.id);
     setLoading(false);
+
     if (res.success) {
       router.back();
     } else {
