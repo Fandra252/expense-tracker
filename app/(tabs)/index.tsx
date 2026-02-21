@@ -9,7 +9,7 @@ import useFetchData from "@/hooks/useFetchData";
 import { TransactionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
-import { orderBy, where } from "firebase/firestore";
+import { limit, orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
 import React from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -22,7 +22,7 @@ const Home = () => {
   console.log("uid", uid);
 
   const constraints = uid
-    ? [where("uid", "==", uid), orderBy("date", "desc")]
+    ? [where("uid", "==", uid), orderBy("date", "desc"), limit(30)]
     : [];
 
   console.log("constraints", constraints);
