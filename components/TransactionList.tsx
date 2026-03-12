@@ -49,6 +49,7 @@ const TransactionList = ({
       <View style={styles.list}>
         <FlashList
           data={data}
+          keyExtractor={(item) => item.id!}
           renderItem={({ item, index }) => (
             <TransactionItem
               item={item}

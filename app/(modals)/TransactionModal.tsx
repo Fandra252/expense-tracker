@@ -9,8 +9,10 @@ import { expenseCategories, transactionTypes } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFetchData from "@/hooks/useFetchData";
-import { createOrUpdateTransaction } from "@/services/transactionService";
-import { deleteWallet } from "@/services/walletService";
+import {
+  createOrUpdateTransaction,
+  deleteTransaction,
+} from "@/services/transactionService";
 import { TransactionType, WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
 import DateTimePicker, {
@@ -101,7 +103,9 @@ const TransactionModal = () => {
       uid: user?.uid,
     };
 
-    if(oldTransaction?.id) transactionData.id = oldTransaction.id;
+    console.log("transactionData: ", transactionData);
+
+    if (oldTransaction?.id) transactionData.id = oldTransaction.id;
     setLoading(true);
     const res = await createOrUpdateTransaction(transactionData);
 
@@ -118,7 +122,7 @@ const TransactionModal = () => {
     if (!oldTransaction?.id) return;
 
     setLoading(true);
-    const res = await deleteWallet(oldTransaction?.id);
+    const res = await deleteTransaction(oldTransaction?.id);
     setLoading(false);
 
     if (res.success) {
@@ -202,7 +206,7 @@ const TransactionModal = () => {
               placeholderStyle={styles.dropDownPlaceholder}
               selectedTextStyle={styles.dropDownSelectedText}
               iconStyle={styles.dropDownIcon}
-              data={wallets.map((wallet) => ({
+              data={wallets?.map((wallet) => ({
                 label: `${wallet?.name} (₹${wallet?.amount})`,
                 value: wallet?.id,
               }))}
