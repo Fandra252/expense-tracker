@@ -1,6 +1,15 @@
 import { firestore } from "@/config/firebase";
 import { ResponseType, WalletType } from "@/types";
-import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+  writeBatch,
+} from "firebase/firestore";
 import { uploadFileToCloudinary } from "./ImageService";
 
 export const createOrUpdateWallet = async (
@@ -50,14 +59,59 @@ export const createOrUpdateWallet = async (
 
 export const deleteWallet = async (walletId: string): Promise<ResponseType> => {
   try {
-    const walletRef = doc(firestore, "wallets", walletId)
-    await deleteDoc(walletRef)
+    const walletRef = doc(firestore, "wallets", walletId);
+    await deleteDoc(walletRef);
+
+    deleteTransactionByWalletId(walletId);
+
     return {
       success: true,
       msg: "Wallet deleted successfully",
     };
   } catch (error: any) {
     console.log("error deleting wallet: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};
+
+export const deleteTransactionByWalletId = async (
+  walletId: string,
+): Promise<ResponseType> => {
+  try {
+    let hasMoreTransactions = true;
+
+    while (hasMoreTransactions) {
+      const transactionQuery = query(
+        collection(firestore, "transactions"),
+        where("walletId", "==", walletId),
+      );
+
+      const transactionSnapshot = await getDocs(transactionQuery);
+      if (transactionSnapshot.size === 0) {
+        hasMoreTransactions = false;
+        break;
+      }
+
+      const batch = writeBatch(firestore);
+      transactionSnapshot.forEach((transactionDoc) => {
+        batch.delete(transactionDoc.ref);
+      });
+
+      await batch.commit();
+
+      console.log(
+        `Deleted batch of ${transactionSnapshot.size} transactions for walletId: ${walletId}`,
+      );
+    }
+    return {
+      success: true,
+      msg: "All transactions deleted successfully",
+    };
+  } catch (error: any) {
+    console.log("error deleting transactions: ", error);
     return {
       success: false,
       msg: error.message,

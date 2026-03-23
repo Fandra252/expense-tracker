@@ -229,7 +229,7 @@ export const deleteTransaction = async (
   try {
     const transactionRef = doc(firestore, "transactions", transactionId);
 
-    const snap = await getDoc(transactionRef);
+    const snap = await getDoc(transactionRef);  
 
     if (!snap.exists()) {
       return {
