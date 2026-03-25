@@ -1,86 +1,51 @@
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 import ScreenWrapper from "@/components/ScreenWrapper";
-import Typo from "@/components/Typo";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContext";
+import { fetchWeeklyStats } from "@/services/transactionService";
 import { scale, verticalScale } from "@/utils/styling";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import React, { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 const Statistics = () => {
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const [chartData, setChartData] = useState([
-    {
-      value: 40,
-      label: "Mon",
-      spacing: scale(5),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-      topLabelComponent: () => (
-        <Typo size={10} style={{ marginBottom: 2 }} fontWeight="bold">
-          40
-        </Typo>
-      ),
-    },
-    {
-      value: 20,
-      frontColor: colors.rose,
-      topLabelComponent: () => (
-        <Typo size={10} style={{ marginBottom: 2 }} fontWeight="bold">
-          40
-        </Typo>
-      ),
-    },
-    {
-      value: 50,
-      label: "Tue",
-      spacing: scale(4),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-    },
-    { value: 40, frontColor: colors.rose },
-    {
-      value: 75,
-      label: "Wed",
-      spacing: scale(4),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-    },
-    { value: 25, frontColor: colors.rose },
-    {
-      value: 30,
-      label: "Thu",
-      spacing: scale(4),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-    },
-    { value: 60, frontColor: colors.rose },
-    {
-      value: 60,
-      label: "Fri",
-      spacing: scale(4),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-    },
-    { value: 40, frontColor: colors.rose },
-    {
-      value: 65,
-      label: "Sta",
-      spacing: scale(4),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-    },
-    { value: 30, frontColor: colors.rose },
-    {
-      value: 65,
-      label: "Sun",
-      spacing: scale(4),
-      labelWidth: scale(30),
-      frontColor: colors.primary,
-    },
-    { value: 30, frontColor: colors.rose },
-  ]);
+  const { user } = useAuth();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [chartLoading, setChartLoading] = useState(false);
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  const getWeeklyStats = useCallback(async () => {
+    setChartLoading(true);
+    const res = await fetchWeeklyStats(user?.uid as string);
+    setChartLoading(false);
+    if (res.success) {
+      setChartData(res?.data?.stats);
+    } else {
+      Alert.alert(
+        "Error",
+        res.msg || "Something went wrong while fetching stats",
+      );
+    }
+  }, [user?.uid]);
+
+  const getMonthlyStats = useCallback(async () => {
+    // TODO: implement
+  }, [user?.uid]);
+
+  const getYearlyStats = useCallback(async () => {
+    // TODO: implement
+  }, [user?.uid]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (activeIndex === 0) await getWeeklyStats();
+      else if (activeIndex === 1) await getMonthlyStats();
+      else if (activeIndex === 2) await getYearlyStats();
+    };
+    fetchStats();
+  }, [activeIndex, getWeeklyStats, getMonthlyStats, getYearlyStats]);
 
   return (
     <ScreenWrapper>
@@ -114,14 +79,16 @@ const Statistics = () => {
             <BarChart
               data={chartData}
               barWidth={scale(13)}
-              spacing={scale(25)}
+              spacing={[1, 2].includes(activeIndex) ? scale(25) : scale(16)}
               roundedTop
               roundedBottom
               hideRules
               yAxisLabelPrefix="₹"
               yAxisThickness={0}
               xAxisThickness={0}
-              yAxisLabelWidth={scale(27)}
+              yAxisLabelWidth={
+                [1, 2].includes(activeIndex) ? scale(38) : scale(35)
+              }
               yAxisTextStyle={{
                 color: colors.neutral350,
               }}
@@ -131,9 +98,16 @@ const Statistics = () => {
               }}
               noOfSections={3}
               minHeight={5}
+              // maxValue={100}
             />
           ) : (
             <View style={styles.noChart} />
+          )}
+
+          {chartLoading && (
+            <View style={styles.chartLoadingContainer}>
+              <Loading color={colors.white} />
+            </View>
           )}
         </View>
       </View>
